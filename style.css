@@ -42,3 +42,116 @@ a{color:inherit;text-decoration:none}button{font:inherit;color:inherit}.shell{wi
     bottom: 24px;
   }
 }
+
+/* FINAL FIX: cân lại bố cục 5 tiêu chí trên desktop */
+@media (min-width: 901px) {
+  .pillars-wrap {
+    height: 650px;
+    margin-top: 30px;
+    padding: 0;
+  }
+
+  /* 01 — góc trái phía trên */
+  .pillars-wrap > .pillar-card:first-of-type {
+    left: 0 !important;
+    right: auto !important;
+    top: 0 !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+
+  /* 02 — trái giữa */
+  .pillars-wrap .pillar-card:nth-of-type(2) {
+    left: 0 !important;
+    right: auto !important;
+    top: 235px !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+
+  /* 03 — góc phải phía trên */
+  .pillars-wrap .pillar-card:nth-of-type(3) {
+    left: auto !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+
+  /* 04 — phải giữa */
+  .pillars-wrap .pillar-card:nth-of-type(4) {
+    left: auto !important;
+    right: 0 !important;
+    top: 235px !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+
+  /* 05 — chính giữa phía dưới, không bị cắt */
+  .pillars-wrap .pillar-card:nth-of-type(5) {
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 0 !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .pillar-card {
+    width: 290px;
+    min-height: 205px;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+  .pillars-wrap {
+    height: 630px;
+  }
+  .pillar-card {
+    width: 250px;
+    min-height: 195px;
+    padding: 24px;
+  }
+  .pillars-wrap .pillar-card:nth-of-type(2),
+  .pillars-wrap .pillar-card:nth-of-type(4) {
+    top: 220px !important;
+  }
+}
+
+/* Robust desktop positioning: card đầu tiên làm 01, các selector sau khớp 02–05 */
+@media (min-width: 901px) {
+  .pillars-wrap > .pillar-card {
+    left: 0;
+    right: auto;
+    top: 0;
+    bottom: auto;
+    transform: none;
+  }
+  .pillars-wrap .pillar-card:nth-of-type(2) {
+    left: 0 !important;
+    right: auto !important;
+    top: 225px !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+  .pillars-wrap .pillar-card:nth-of-type(3) {
+    left: auto !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+  .pillars-wrap .pillar-card:nth-of-type(4) {
+    left: auto !important;
+    right: 0 !important;
+    top: 225px !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+  .pillars-wrap .pillar-card:nth-of-type(5) {
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 0 !important;
+    transform: translateX(-50%) !important;
+  }
+}
