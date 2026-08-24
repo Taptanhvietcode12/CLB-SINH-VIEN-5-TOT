@@ -2,13 +2,13 @@ const config = {
   qrLinks: { n1: "https://zalo.me/g/tjktxh194?joinSrc=9", n2: "https://zalo.me/g/qxsgxi306?joinSrc=9", n3: "https://zalo.me/g/lftmjc820", n4: "https://zalo.me/g/kzcnvk517?joinSrc=9" },
   socialLinks: { facebook: "", tiktok: "", discord: "", email: "", address: "" }
 };
-
+ 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 let toastTimer;
-
+ 
 function qs(selector, root = document) { return root.querySelector(selector); }
 function qsa(selector, root = document) { return [...root.querySelectorAll(selector)]; }
-
+ 
 function showToast(message) {
   const toast = qs(".toast");
   toast.textContent = message;
@@ -16,7 +16,7 @@ function showToast(message) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 2300);
 }
-
+ 
 function initNavbar() {
   const header = qs(".site-header");
   const menuBtn = qs(".menu-toggle");
@@ -37,9 +37,9 @@ function initNavbar() {
   qsa(".mobile-menu a").forEach(link => link.addEventListener("click", closeMenu));
   window.addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 20), { passive: true });
 }
-
+ 
 function initMobileMenu() {}
-
+ 
 function initSmoothScroll() {
   qsa('a[href^="#"]').forEach(link => {
     link.addEventListener("click", event => {
@@ -52,7 +52,7 @@ function initSmoothScroll() {
     });
   });
 }
-
+ 
 function initScrollReveal() {
   const items = qsa(".reveal");
   if (reducedMotion) {
@@ -69,7 +69,7 @@ function initScrollReveal() {
   }, { threshold: 0.12, rootMargin: "0px 0px -40px" });
   items.forEach(el => observer.observe(el));
 }
-
+ 
 function initFAQ() {
   qsa(".faq-item").forEach(item => {
     const button = qs("button", item);
@@ -89,7 +89,7 @@ function initFAQ() {
     });
   });
 }
-
+ 
 function initQRButtons() {
   qsa(".qr-card").forEach(card => {
     const key = card.dataset.qr;
@@ -118,9 +118,9 @@ function initQRButtons() {
     });
   });
 }
-
+ 
 function initCopyButtons() {}
-
+ 
 function initCardTilt() {
   if (reducedMotion || window.matchMedia("(max-width: 767px)").matches) return;
   qsa(".tilt").forEach(card => {
@@ -139,7 +139,7 @@ function initCardTilt() {
     });
   });
 }
-
+ 
 function initParallax() {
   const glow = qs(".cursor-glow");
   const scene = qs(".scene");
@@ -162,7 +162,7 @@ function initParallax() {
     });
   }, { passive: true });
 }
-
+ 
 function initParticles() {
   const canvas = qs("#particle-canvas");
   if (!canvas || reducedMotion) return;
@@ -198,7 +198,7 @@ function initParticles() {
   addEventListener("resize", resize, {passive:true});
   resize(); frame();
 }
-
+ 
 function initScrollProgress() {
   const bar = qs(".scroll-progress span");
   const timeline = qs(".timeline-line span");
@@ -214,13 +214,13 @@ function initScrollProgress() {
   };
   addEventListener("scroll", update, {passive:true}); update();
 }
-
+ 
 function initBackToTop() {
   const btn = qs(".back-top");
   addEventListener("scroll", () => btn.classList.toggle("visible", scrollY > 600), {passive:true});
   btn.addEventListener("click", () => scrollTo({top:0, behavior: reducedMotion ? "auto" : "smooth"}));
 }
-
+ 
 function initActiveNavigation() {
   const links = qsa(".nav-links a");
   const sections = links.map(link => qs(link.getAttribute("href"))).filter(Boolean);
@@ -232,18 +232,18 @@ function initActiveNavigation() {
   }, {rootMargin:"-35% 0px -55% 0px", threshold:0});
   sections.forEach(section => observer.observe(section));
 }
-
+ 
 function initReducedMotion() {
   document.documentElement.dataset.reducedMotion = reducedMotion ? "true" : "false";
 }
-
+ 
 function initLoading() {
   window.addEventListener("load", () => {
     setTimeout(() => qs("#preloader")?.classList.add("loaded"), 450);
   });
   setTimeout(() => qs("#preloader")?.classList.add("loaded"), 1800);
 }
-
+ 
 function initMissingAssets() {
   qsa("img").forEach(img => {
     img.addEventListener("error", () => {
@@ -257,79 +257,79 @@ function initBackgroundMusic() {
   const toggle = qs("#musicToggle");
   const intro = qs("#intro-screen");
   const startButton = qs("#startExperience");
-
+ 
   if (!music) return;
-
+ 
   music.loop = true;
   music.preload = "auto";
   music.volume = 0.35;
-
+ 
   let playing = false;
-
+ 
   function updateMusicButton() {
     if (!toggle) return;
-
+ 
     toggle.classList.toggle("playing", playing);
-
+ 
     toggle.textContent = playing ? "♫" : "♪";
-
+ 
     toggle.setAttribute(
       "aria-label",
       playing ? "Tắt nhạc nền" : "Bật nhạc nền"
     );
   }
-
+ 
   async function startMusic() {
     try {
       music.muted = false;
       await music.play();
-
+ 
       playing = true;
       updateMusicButton();
-
+ 
     } catch (error) {
       console.log("Không thể phát nhạc:", error);
     }
   }
-
+ 
   function stopMusic() {
     music.pause();
     playing = false;
     updateMusicButton();
   }
-
+ 
   /* =========================================
      BẤM "BẮT ĐẦU HÀNH TRÌNH"
   ========================================= */
-
+ 
   if (startButton) {
     startButton.addEventListener("click", async () => {
-
+ 
       // Bật nhạc ngay trong chính user interaction
       await startMusic();
-
+ 
       // Đóng intro
       if (intro) {
         intro.classList.add("hidden");
-
+ 
         setTimeout(() => {
           intro.remove();
         }, 1000);
       }
-
+ 
       // Cho phép body scroll lại
       document.body.classList.remove("intro-active");
     });
   }
-
+ 
   /* =========================================
      NÚT NHẠC
   ========================================= */
-
+ 
   if (toggle) {
     toggle.addEventListener("click", async event => {
       event.stopPropagation();
-
+ 
       if (playing) {
         stopMusic();
       } else {
@@ -337,17 +337,17 @@ function initBackgroundMusic() {
       }
     });
   }
-
+ 
   music.addEventListener("play", () => {
     playing = true;
     updateMusicButton();
   });
-
+ 
   music.addEventListener("pause", () => {
     playing = false;
     updateMusicButton();
   });
-
+ 
   updateMusicButton();
 }
 function init() {
@@ -367,8 +367,14 @@ function init() {
   initReducedMotion();
   initLoading();
   initMissingAssets();
-
+ 
   // Nhạc + màn hình bắt đầu
   initBackgroundMusic();
 }
 document.addEventListener("DOMContentLoaded", init);
+ 
+
+
+
+
+
