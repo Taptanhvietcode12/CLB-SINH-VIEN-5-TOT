@@ -1,5 +1,5 @@
 const config = {
-  qrLinks: { n1: "", n2: "", n3: "", n4: "" },
+  qrLinks: { n1: "https://zalo.me/g/tjktxh194?joinSrc=9", n2: "https://zalo.me/g/qxsgxi306?joinSrc=9", n3: "https://zalo.me/g/lftmjc820", n4: "https://zalo.me/g/kzcnvk517?joinSrc=9" },
   socialLinks: { facebook: "", tiktok: "", discord: "", email: "", address: "" }
 };
 
