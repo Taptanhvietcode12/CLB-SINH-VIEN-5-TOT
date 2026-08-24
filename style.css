@@ -155,3 +155,350 @@ a{color:inherit;text-decoration:none}button{font:inherit;color:inherit}.shell{wi
     transform: translateX(-50%) !important;
   }
 }
+
+/* =========================================================
+   05 TIÊU CHÍ — ORBIT SYSTEM / PLANETS AROUND THE SUN
+   Desktop: thay bố cục cố định bằng hệ quỹ đạo động.
+   Mobile vẫn giữ layout dạng lưới ở breakpoint bên trên.
+   ========================================================= */
+
+@media (min-width: 901px) {
+
+  .pillars-wrap {
+    height: 760px !important;
+    margin-top: 45px !important;
+    position: relative;
+    overflow: visible;
+    isolation: isolate;
+  }
+
+  /* Quỹ đạo phía sau các "hành tinh" */
+  .pillars-wrap::before,
+  .pillars-wrap::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+  }
+
+  .pillars-wrap::before {
+    width: 500px;
+    height: 500px;
+    border: 1px solid rgba(22,119,255,.13);
+    box-shadow:
+      0 0 80px rgba(22,119,255,.055),
+      inset 0 0 70px rgba(34,211,238,.035);
+  }
+
+  .pillars-wrap::after {
+    width: 650px;
+    height: 650px;
+    border: 1px dashed rgba(124,58,237,.10);
+    transform: translate(-50%, -50%) rotate(-18deg);
+  }
+
+  /* Mặt trời / trung tâm hệ */
+  .pillar-center {
+    left: 50% !important;
+    top: 50% !important;
+    width: 210px !important;
+    height: 210px !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 5;
+    background:
+      radial-gradient(circle at 38% 32%,
+        rgba(255,255,255,.48) 0%,
+        rgba(34,211,238,.18) 18%,
+        rgba(22,119,255,.10) 42%,
+        rgba(22,119,255,.025) 68%,
+        transparent 74%);
+    border-color: rgba(22,119,255,.28);
+    box-shadow:
+      0 0 45px rgba(34,211,238,.18),
+      0 0 120px rgba(22,119,255,.13),
+      inset 0 0 55px rgba(34,211,238,.10);
+    animation: sunPulse 4.5s ease-in-out infinite;
+  }
+
+  .pillar-center::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    border: 1px solid rgba(34,211,238,.16);
+    animation: sunRing 10s linear infinite;
+  }
+
+  .pillar-center::after {
+    content: "";
+    position: absolute;
+    inset: -30px;
+    border-radius: 50%;
+    border: 1px solid rgba(124,58,237,.08);
+    transform: rotateX(65deg);
+  }
+
+  .pillar-center span,
+  .pillar-center small {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Mỗi card = một hành tinh */
+  .pillars-wrap > .pillar-card {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 250px !important;
+    min-height: 190px !important;
+    padding: 25px !important;
+    z-index: 4;
+
+    /* Giữ card đứng thẳng trong khi quỹ đạo quay */
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--start-angle))
+      translateX(var(--orbit-radius))
+      rotate(calc(var(--start-angle) * -1));
+
+    animation:
+      pillarOrbit var(--orbit-duration) linear infinite,
+      planetFloat 5.5s ease-in-out infinite;
+    animation-delay: var(--orbit-delay), var(--float-delay);
+    transform-origin: center center;
+
+    will-change: transform;
+    backface-visibility: hidden;
+
+    background:
+      linear-gradient(145deg,
+        rgba(255,255,255,.94),
+        rgba(248,251,255,.78));
+    border: 1px solid rgba(40,92,145,.14);
+    box-shadow:
+      0 18px 55px rgba(27,66,108,.10),
+      0 0 0 1px rgba(255,255,255,.35) inset;
+    backdrop-filter: blur(14px);
+  }
+
+  /* Ánh sáng "phía mặt trời" */
+  .pillars-wrap > .pillar-card::before {
+    content: "";
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    left: -45px;
+    top: -55px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      rgba(34,211,238,.16),
+      rgba(22,119,255,.05) 45%,
+      transparent 72%);
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  /* Vệt sáng chạy nhẹ trên card */
+  .pillars-wrap > .pillar-card::after {
+    opacity: .65;
+    background:
+      linear-gradient(120deg,
+        transparent 15%,
+        rgba(255,255,255,.28) 48%,
+        transparent 68%);
+    transform: translateX(-120%);
+    transition: transform .8s ease;
+  }
+
+  .pillars-wrap > .pillar-card:hover::after {
+    transform: translateX(120%);
+  }
+
+  .pillars-wrap > .pillar-card:hover {
+    z-index: 10;
+    border-color: rgba(22,119,255,.38);
+    box-shadow:
+      0 30px 90px rgba(27,83,150,.18),
+      0 0 35px rgba(34,211,238,.08);
+  }
+
+  /*
+   * 01 — quỹ đạo lớn
+   * 02 — lệch pha
+   * 03 — quỹ đạo khác tốc độ
+   * 04 — lệch pha ngược
+   * 05 — gần mặt trời hơn một chút
+   */
+  .pillars-wrap > .pillar-card:nth-of-type(1) {
+    --orbit-radius: 265px;
+    --start-angle: -145deg;
+    --orbit-duration: 30s;
+    --orbit-delay: -1s;
+    --float-delay: -.5s;
+  }
+
+  .pillars-wrap > .pillar-card:nth-of-type(2) {
+    --orbit-radius: 265px;
+    --start-angle: -72deg;
+    --orbit-duration: 34s;
+    --orbit-delay: -7s;
+    --float-delay: -2s;
+  }
+
+  .pillars-wrap > .pillar-card:nth-of-type(3) {
+    --orbit-radius: 265px;
+    --start-angle: 0deg;
+    --orbit-duration: 31s;
+    --orbit-delay: -14s;
+    --float-delay: -3.5s;
+  }
+
+  .pillars-wrap > .pillar-card:nth-of-type(4) {
+    --orbit-radius: 265px;
+    --start-angle: 72deg;
+    --orbit-duration: 36s;
+    --orbit-delay: -20s;
+    --float-delay: -1.5s;
+  }
+
+  .pillars-wrap > .pillar-card:nth-of-type(5) {
+    --orbit-radius: 265px;
+    --start-angle: 145deg;
+    --orbit-duration: 33s;
+    --orbit-delay: -26s;
+    --float-delay: -4s;
+  }
+
+  /* Số thứ tự / icon tinh tế hơn */
+  .pillars-wrap > .pillar-card .card-number {
+    position: relative;
+    z-index: 2;
+    color: #7e9abd;
+    letter-spacing: .08em;
+  }
+
+  .pillars-wrap > .pillar-card .icon-line {
+    position: relative;
+    z-index: 2;
+    margin: 20px 0 12px;
+    text-shadow: 0 0 18px rgba(22,119,255,.18);
+  }
+
+  .pillars-wrap > .pillar-card h3,
+  .pillars-wrap > .pillar-card p {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Chấm sáng nhỏ trên quỹ đạo */
+  .pillars-wrap .pillar-center + .orbit-dot {
+    position: absolute;
+  }
+
+  /* Animation: quay quanh tâm nhưng card luôn ngay ngắn */
+  @keyframes pillarOrbit {
+    0% {
+      transform:
+        translate(-50%, -50%)
+        rotate(var(--start-angle))
+        translateX(var(--orbit-radius))
+        rotate(calc(var(--start-angle) * -1));
+    }
+
+    50% {
+      transform:
+        translate(-50%, -50%)
+        rotate(calc(var(--start-angle) + 180deg))
+        translateX(var(--orbit-radius))
+        rotate(calc((var(--start-angle) + 180deg) * -1));
+    }
+
+    100% {
+      transform:
+        translate(-50%, -50%)
+        rotate(calc(var(--start-angle) + 360deg))
+        translateX(var(--orbit-radius))
+        rotate(calc((var(--start-angle) + 360deg) * -1));
+    }
+  }
+
+  @keyframes planetFloat {
+    0%, 100% {
+      margin-top: 0;
+    }
+    50% {
+      margin-top: -7px;
+    }
+  }
+
+  @keyframes sunPulse {
+    0%, 100% {
+      box-shadow:
+        0 0 45px rgba(34,211,238,.18),
+        0 0 120px rgba(22,119,255,.13),
+        inset 0 0 55px rgba(34,211,238,.10);
+    }
+    50% {
+      box-shadow:
+        0 0 65px rgba(34,211,238,.25),
+        0 0 145px rgba(22,119,255,.18),
+        inset 0 0 70px rgba(34,211,238,.15);
+    }
+  }
+
+  @keyframes sunRing {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Khi rê chuột: hệ hành tinh chậm lại, card nổi lên */
+  .pillars-wrap:hover > .pillar-card {
+    animation-play-state: paused;
+  }
+
+  .pillars-wrap:hover > .pillar-card:hover {
+    animation-play-state: running;
+  }
+}
+
+/* Tablet: thu nhỏ quỹ đạo để không tràn màn hình */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .pillars-wrap {
+    height: 700px !important;
+  }
+
+  .pillars-wrap > .pillar-card {
+    width: 225px !important;
+    min-height: 180px !important;
+    padding: 22px !important;
+  }
+
+  .pillars-wrap > .pillar-card:nth-of-type(1),
+  .pillars-wrap > .pillar-card:nth-of-type(2),
+  .pillars-wrap > .pillar-card:nth-of-type(3),
+  .pillars-wrap > .pillar-card:nth-of-type(4),
+  .pillars-wrap > .pillar-card:nth-of-type(5) {
+    --orbit-radius: 235px;
+  }
+
+  .pillar-center {
+    width: 190px !important;
+    height: 190px !important;
+  }
+}
+
+/* Người dùng không muốn chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  .pillars-wrap > .pillar-card,
+  .pillar-center,
+  .pillar-center::before {
+    animation: none !important;
+  }
+}
