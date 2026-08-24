@@ -350,7 +350,6 @@ function initBackgroundMusic() {
 
   updateMusicButton();
 }
-}
 function init() {
   initNavbar();
   initMobileMenu();
@@ -371,6 +370,5 @@ function init() {
 
   // Nhạc + màn hình bắt đầu
   initBackgroundMusic();
-}
 }
 document.addEventListener("DOMContentLoaded", init);
