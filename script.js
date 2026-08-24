@@ -255,47 +255,101 @@ function initMissingAssets() {
 function initBackgroundMusic() {
   const music = qs("#bgMusic");
   const toggle = qs("#musicToggle");
+  const intro = qs("#intro-screen");
+  const startButton = qs("#startExperience");
 
-  if (!music || !toggle) return;
+  if (!music) return;
+
+  music.loop = true;
+  music.preload = "auto";
+  music.volume = 0.35;
 
   let playing = false;
 
-  music.loop = true;
-  music.volume = 0.35;
+  function updateMusicButton() {
+    if (!toggle) return;
 
-  const updateButton = () => {
     toggle.classList.toggle("playing", playing);
+
     toggle.textContent = playing ? "♫" : "♪";
-  };
 
-  toggle.addEventListener("click", async () => {
-    if (playing) {
-      music.pause();
-      playing = false;
-      updateButton();
-      return;
-    }
+    toggle.setAttribute(
+      "aria-label",
+      playing ? "Tắt nhạc nền" : "Bật nhạc nền"
+    );
+  }
 
+  async function startMusic() {
     try {
+      music.muted = false;
       await music.play();
+
       playing = true;
-      updateButton();
+      updateMusicButton();
+
     } catch (error) {
       console.log("Không thể phát nhạc:", error);
     }
-  });
+  }
+
+  function stopMusic() {
+    music.pause();
+    playing = false;
+    updateMusicButton();
+  }
+
+  /* =========================================
+     BẤM "BẮT ĐẦU HÀNH TRÌNH"
+  ========================================= */
+
+  if (startButton) {
+    startButton.addEventListener("click", async () => {
+
+      // Bật nhạc ngay trong chính user interaction
+      await startMusic();
+
+      // Đóng intro
+      if (intro) {
+        intro.classList.add("hidden");
+
+        setTimeout(() => {
+          intro.remove();
+        }, 1000);
+      }
+
+      // Cho phép body scroll lại
+      document.body.classList.remove("intro-active");
+    });
+  }
+
+  /* =========================================
+     NÚT NHẠC
+  ========================================= */
+
+  if (toggle) {
+    toggle.addEventListener("click", async event => {
+      event.stopPropagation();
+
+      if (playing) {
+        stopMusic();
+      } else {
+        await startMusic();
+      }
+    });
+  }
 
   music.addEventListener("play", () => {
     playing = true;
-    updateButton();
+    updateMusicButton();
   });
 
   music.addEventListener("pause", () => {
     playing = false;
-    updateButton();
+    updateMusicButton();
   });
 
-  updateButton();
+  updateMusicButton();
+}
 }
 function init() {
   initNavbar();
@@ -314,6 +368,9 @@ function init() {
   initReducedMotion();
   initLoading();
   initMissingAssets();
+
+  // Nhạc + màn hình bắt đầu
   initBackgroundMusic();
+}
 }
 document.addEventListener("DOMContentLoaded", init);
