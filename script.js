@@ -252,7 +252,51 @@ function initMissingAssets() {
     });
   });
 }
+function initBackgroundMusic() {
+  const music = qs("#bgMusic");
+  const toggle = qs("#musicToggle");
 
+  if (!music || !toggle) return;
+
+  let playing = false;
+
+  music.loop = true;
+  music.volume = 0.35;
+
+  const updateButton = () => {
+    toggle.classList.toggle("playing", playing);
+    toggle.textContent = playing ? "♫" : "♪";
+  };
+
+  toggle.addEventListener("click", async () => {
+    if (playing) {
+      music.pause();
+      playing = false;
+      updateButton();
+      return;
+    }
+
+    try {
+      await music.play();
+      playing = true;
+      updateButton();
+    } catch (error) {
+      console.log("Không thể phát nhạc:", error);
+    }
+  });
+
+  music.addEventListener("play", () => {
+    playing = true;
+    updateButton();
+  });
+
+  music.addEventListener("pause", () => {
+    playing = false;
+    updateButton();
+  });
+
+  updateButton();
+}
 function init() {
   initNavbar();
   initMobileMenu();
@@ -270,5 +314,6 @@ function init() {
   initReducedMotion();
   initLoading();
   initMissingAssets();
+  initBackgroundMusic();
 }
 document.addEventListener("DOMContentLoaded", init);
