@@ -372,7 +372,6 @@ function init() {
   initBackgroundMusic();
 }
 document.addEventListener("DOMContentLoaded", init);
- 
 
 
 
