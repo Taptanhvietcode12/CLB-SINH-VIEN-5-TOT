@@ -1,6 +1,19 @@
 const config = {
-  qrLinks: { n1: "https://zalo.me/g/tjktxh194?joinSrc=9", n2: "https://zalo.me/g/qxsgxi306?joinSrc=9", n3: "https://zalo.me/g/lftmjc820", n4: "https://zalo.me/g/kzcnvk517?joinSrc=9" },
-  socialLinks: { facebook: "", tiktok: "", discord: "", email: "", address: "" }
+  // ⚠️ HTML hiện có 6 thẻ QR (n1 → n6) nhưng ở đây mới chỉ khai báo 4 liên kết.
+  // Nếu chưa có link cho N5 / N6, hãy điền vào bên dưới, nếu không 2 nút này sẽ luôn
+  // hiện thông báo "Liên kết chưa được cập nhật."
+  qrLinks: {
+    n1: "https://zalo.me/g/tjktxh194?joinSrc=9",
+    n2: "https://zalo.me/g/qxsgxi306?joinSrc=9",
+    n3: "https://zalo.me/g/lftmjc820",
+    n4: "https://zalo.me/g/kzcnvk517?joinSrc=9",
+    n5: "",
+    n6: ""
+  },
+  // socialLinks hiện KHÔNG được dùng ở đâu trong file này (footer đang gắn href
+  // trực tiếp trong HTML). Điền link thật rồi initSocialLinks() bên dưới sẽ tự
+  // cập nhật href cho các thẻ .social-link[data-social="..."] tương ứng.
+  socialLinks: { fanpage: "", facebook: "", tiktok: "", discord: "", email: "", address: "" }
 };
  
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -37,8 +50,6 @@ function initNavbar() {
   qsa(".mobile-menu a").forEach(link => link.addEventListener("click", closeMenu));
   window.addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 20), { passive: true });
 }
- 
-function initMobileMenu() {}
  
 function initSmoothScroll() {
   qsa('a[href^="#"]').forEach(link => {
@@ -119,7 +130,80 @@ function initQRButtons() {
   });
 }
  
-function initCopyButtons() {}
+/**
+ * Modal "Xem chi tiết" cho các .activity-card (mục Hoạt động nổi bật).
+ * HTML/CSS đã dựng sẵn #activityModal + data-title/data-tag/data-img/data-alt/data-desc
+ * trên từng .activity-card, nhưng trước đây KHÔNG có JS nào mở/đóng modal này —
+ * bấm vào ảnh hoạt động sẽ không có phản hồi gì cả. Hàm dưới đây bổ sung phần đó.
+ */
+function initActivityModal() {
+  const modal = qs("#activityModal");
+  const cards = qsa(".activity-card");
+  if (!modal || !cards.length) return;
+
+  const img = qs("#activityModalImg", modal);
+  const tag = qs("#activityModalTag", modal);
+  const title = qs("#activityModalTitle", modal);
+  const desc = qs("#activityModalDesc", modal);
+  const media = qs(".activity-modal-media", modal);
+  let lastFocused = null;
+
+  function openModal(card) {
+    lastFocused = document.activeElement;
+    media.classList.remove("activity-missing");
+    img.src = card.dataset.img || "";
+    img.alt = card.dataset.alt || card.dataset.title || "";
+    tag.textContent = card.dataset.tag || "";
+    title.textContent = card.dataset.title || "";
+    desc.textContent = card.dataset.desc || "";
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    qs(".activity-modal-close", modal)?.focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    lastFocused?.focus();
+  }
+
+  img.addEventListener("error", () => media.classList.add("activity-missing"));
+
+  cards.forEach(card => {
+    card.addEventListener("click", () => openModal(card));
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openModal(card);
+      }
+    });
+  });
+
+  qsa("[data-close]", modal).forEach(el => el.addEventListener("click", closeModal));
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("open")) closeModal();
+  });
+}
+
+/**
+ * Gán href thật cho các nút mạng xã hội ở footer dựa trên config.socialLinks.
+ * Nếu để trống, thẻ tương ứng sẽ bị vô hiệu hoá (tránh dẫn tới href="#" chết).
+ */
+function initSocialLinks() {
+  qsa(".social-link[data-social]").forEach(link => {
+    const key = link.dataset.social;
+    const url = config.socialLinks[key];
+    if (url) {
+      link.href = key === "email" ? `mailto:${url}` : url;
+      link.removeAttribute("aria-disabled");
+    } else if (link.getAttribute("href") === "#") {
+      link.setAttribute("aria-disabled", "true");
+      link.addEventListener("click", event => event.preventDefault());
+    }
+  });
+}
  
 function initCardTilt() {
   if (reducedMotion || window.matchMedia("(max-width: 767px)").matches) return;
@@ -352,12 +436,12 @@ function initBackgroundMusic() {
 }
 function init() {
   initNavbar();
-  initMobileMenu();
   initSmoothScroll();
   initScrollReveal();
   initFAQ();
   initQRButtons();
-  initCopyButtons();
+  initActivityModal();
+  initSocialLinks();
   initCardTilt();
   initParallax();
   initParticles();
@@ -372,8 +456,4 @@ function init() {
   initBackgroundMusic();
 }
 document.addEventListener("DOMContentLoaded", init);
-
-
-
-
 
