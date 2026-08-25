@@ -131,6 +131,93 @@ function initQRButtons() {
 }
  
 /**
+ * Mục "Mạng xã hội": mỗi thẻ .social-hub-card có data-url (và data-copy tùy chọn).
+ * Nút đầu mở liên kết (mailto:/tel: sẽ điều hướng trực tiếp, còn lại mở tab mới),
+ * nút sau sao chép liên kết/email/số điện thoại vào clipboard.
+ */
+function initSocialHub() {
+  qsa(".social-hub-card").forEach(card => {
+    const url = card.dataset.url;
+    const copyText = card.dataset.copy || url;
+    const openBtn = qs(".social-open", card);
+    const copyBtn = qs(".social-copy", card);
+    openBtn?.addEventListener("click", () => {
+      if (!url) {
+        showToast("Liên kết chưa được cập nhật.");
+        return;
+      }
+      if (url.startsWith("mailto:") || url.startsWith("tel:")) {
+        window.location.href = url;
+      } else {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    });
+    copyBtn?.addEventListener("click", async () => {
+      if (!copyText) {
+        showToast("Liên kết chưa được cập nhật.");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(copyText);
+        showToast("Đã sao chép!");
+      } catch {
+        showToast("Không thể sao chép trên thiết bị này.");
+      }
+    });
+  });
+}
+
+/**
+ * Hiệu ứng "nam châm": các nút .magnetic (đã có sẵn class trong HTML nhưng
+ * trước đây chưa có hiệu ứng nào) sẽ hơi nhích theo con trỏ khi rê chuột qua,
+ * tạo cảm giác nút "hút" chuột lại gần — chỉ bật trên desktop, tắt khi
+ * prefers-reduced-motion.
+ */
+function initMagneticButtons() {
+  if (reducedMotion || window.matchMedia("(max-width: 767px)").matches) return;
+  qsa(".magnetic").forEach(btn => {
+    btn.addEventListener("pointermove", event => {
+      const rect = btn.getBoundingClientRect();
+      const x = event.clientX - rect.left - rect.width / 2;
+      const y = event.clientY - rect.top - rect.height / 2;
+      btn.style.transform = `translate(${x * 0.25}px, ${y * 0.35}px)`;
+    });
+    btn.addEventListener("pointerleave", () => {
+      btn.style.transform = "";
+    });
+  });
+}
+
+/**
+ * Hiệu ứng pháo giấy nhỏ khi bấm các nút CTA chính (.button-primary),
+ * tạo cảm giác vui mắt, thưởng cho hành động "tham gia".
+ */
+function initConfettiBurst() {
+  if (reducedMotion) return;
+  const colors = ["#22d3ee", "#1677ff", "#7c3aed", "#ffffff"];
+  qsa(".button-primary").forEach(btn => {
+    btn.addEventListener("click", event => {
+      const rect = btn.getBoundingClientRect();
+      const originX = event.clientX || rect.left + rect.width / 2;
+      const originY = event.clientY || rect.top + rect.height / 2;
+      for (let i = 0; i < 16; i++) {
+        const bit = document.createElement("span");
+        bit.className = "confetti-bit";
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 55 + Math.random() * 65;
+        bit.style.setProperty("--dx", `${Math.cos(angle) * distance}px`);
+        bit.style.setProperty("--dy", `${Math.sin(angle) * distance - 35}px`);
+        bit.style.left = `${originX}px`;
+        bit.style.top = `${originY}px`;
+        bit.style.background = colors[i % colors.length];
+        document.body.appendChild(bit);
+        bit.addEventListener("animationend", () => bit.remove());
+      }
+    });
+  });
+}
+
+/**
  * Modal "Xem chi tiết" cho các .activity-card (mục Hoạt động nổi bật).
  * HTML/CSS đã dựng sẵn #activityModal + data-title/data-tag/data-img/data-alt/data-desc
  * trên từng .activity-card, nhưng trước đây KHÔNG có JS nào mở/đóng modal này —
@@ -442,6 +529,9 @@ function init() {
   initQRButtons();
   initActivityModal();
   initSocialLinks();
+  initSocialHub();
+  initMagneticButtons();
+  initConfettiBurst();
   initCardTilt();
   initParallax();
   initParticles();
@@ -456,4 +546,3 @@ function init() {
   initBackgroundMusic();
 }
 document.addEventListener("DOMContentLoaded", init);
-
