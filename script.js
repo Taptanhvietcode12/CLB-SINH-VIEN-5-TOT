@@ -7,7 +7,7 @@ const config = {
     n2: "https://zalo.me/g/qxsgxi306?joinSrc=9",
     n3: "https://zalo.me/g/lftmjc820",
     n4: "https://zalo.me/g/kzcnvk517?joinSrc=9",
-    n5: "",
+    n5: "https://zalo.me/g/kkysjf15itpkg5mnhy1l",
     n6: ""
   },
   // socialLinks hiện KHÔNG được dùng ở đâu trong file này (footer đang gắn href
