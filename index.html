@@ -209,6 +209,27 @@
           <p>Một vài lát cắt trong hành trình của CLB. Chạm vào từng hình ảnh để xem thông tin chi tiết.</p>
         </div>
         <div class="activities-grid">
+          <article class="activity-card activity-card-video reveal tilt" tabindex="0" role="button" aria-haspopup="dialog"
+            data-title="Khoảnh Khắc CLB Sinh Viên 5 Tốt"
+            data-tag="Video"
+            data-video="assets/intro-loop.mp4"
+            data-video-webm="assets/intro-loop.webm"
+            data-poster="assets/intro-loop-poster.jpg"
+            data-alt="Video khoảnh khắc hoạt động CLB Sinh viên 5 Tốt"
+            data-desc="Một vài khoảnh khắc nổi bật trong hành trình hoạt động của CLB Sinh viên 5 Tốt Trường Đại học Đồng Tháp.">
+            <div class="activity-frame activity-frame-video">
+              <video class="activity-video" poster="assets/intro-loop-poster.jpg" muted loop playsinline preload="none" aria-label="Video khoảnh khắc hoạt động CLB Sinh viên 5 Tốt">
+                <source data-src="assets/intro-loop.webm" type="video/webm">
+                <source data-src="assets/intro-loop.mp4" type="video/mp4">
+              </video>
+              <span class="activity-video-badge"><i></i>VIDEO</span>
+              <div class="activity-overlay">
+                <span class="activity-tag">Video</span>
+                <h3>Khoảnh Khắc CLB Sinh Viên 5 Tốt</h3>
+                <span class="activity-view">XEM CHI TIẾT <i>↗</i></span>
+              </div>
+            </div>
+          </article>
           <article class="activity-card reveal tilt" tabindex="0" role="button" aria-haspopup="dialog"
             data-title="Vị Ngọt Cho Em"
             data-tag="Thiện nguyện"
@@ -482,7 +503,10 @@
     <div class="activity-modal-backdrop" data-close></div>
     <div class="activity-modal-panel" role="dialog" aria-modal="true" aria-labelledby="activityModalTitle">
       <button class="activity-modal-close" type="button" aria-label="Đóng" data-close>✕</button>
-      <div class="activity-modal-media"><img id="activityModalImg" src="" alt=""></div>
+      <div class="activity-modal-media">
+        <img id="activityModalImg" src="" alt="">
+        <video id="activityModalVideo" muted loop playsinline preload="none" aria-hidden="true"></video>
+      </div>
       <div class="activity-modal-body">
         <span class="activity-tag" id="activityModalTag"></span>
         <h3 id="activityModalTitle"></h3>
