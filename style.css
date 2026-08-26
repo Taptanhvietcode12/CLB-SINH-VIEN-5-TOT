@@ -941,6 +941,10 @@ body.intro-active {
 .activity-card:hover .activity-frame img{transform:scale(1.06)}
 .activity-frame.activity-missing img{opacity:0}
 .activity-frame.activity-missing:before{content:"HÌNH ẢNH ĐANG CẬP NHẬT";position:absolute;inset:0;display:grid;place-items:center;color:#8ca2bb;text-align:center;font-size:10px;font-weight:800;letter-spacing:.08em;padding:0 20px}
+.activity-frame-video .activity-video{width:100%;height:100%;object-fit:cover;display:block;background:#07182d;transition:transform .5s var(--ease)}
+.activity-card:hover .activity-frame-video .activity-video{transform:scale(1.06)}
+.activity-video-badge{position:absolute;top:14px;left:14px;z-index:2;display:inline-flex;align-items:center;gap:6px;font:700 8px "Space Grotesk";letter-spacing:.14em;color:#fff;background:rgba(6,20,38,.55);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);padding:6px 10px 6px 8px;border-radius:99px}
+.activity-video-badge i{width:6px;height:6px;border-radius:50%;background:#ff4d4f;box-shadow:0 0 0 0 rgba(255,77,79,.6);animation:pulse 1.8s infinite}
 .activity-overlay{position:absolute;left:0;right:0;bottom:0;padding:16px 16px 14px;background:linear-gradient(0deg,rgba(4,14,26,.92),rgba(4,14,26,.55) 60%,transparent);color:#fff}
 .activity-tag{display:inline-block;font:700 8px "Space Grotesk";letter-spacing:.14em;color:var(--cyan);text-transform:uppercase;margin-bottom:6px}
 .activity-overlay h3{font:700 14px/1.35 "Space Grotesk";margin:0 0 8px}
@@ -958,6 +962,9 @@ body.intro-active {
 .activity-modal-close:hover{border-color:var(--cyan);transform:rotate(90deg)}
 .activity-modal-media{position:relative;aspect-ratio:16/9;background:linear-gradient(150deg,#0d2743,#07182d)}
 .activity-modal-media img{width:100%;height:100%;object-fit:cover;display:block}
+.activity-modal-media video{width:100%;height:100%;object-fit:cover;display:none}
+.activity-modal-media.is-video img{display:none}
+.activity-modal-media.is-video video{display:block}
 .activity-modal-media.activity-missing img{opacity:0}
 .activity-modal-media.activity-missing:before{content:"HÌNH ẢNH ĐANG CẬP NHẬT";position:absolute;inset:0;display:grid;place-items:center;color:#8ca2bb;font-size:11px;font-weight:800;letter-spacing:.08em}
 .activity-modal-body{padding:26px 28px 30px;color:#fff}
@@ -1004,8 +1011,10 @@ body.modal-open{overflow:hidden}
 .social-link[aria-disabled="true"]{opacity:.4;cursor:not-allowed;pointer-events:none}
 
 @media(max-width:1100px){.activities-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.activities-grid{grid-template-columns:1fr}.activity-modal-panel{border-radius:20px}.activity-modal-body{padding:22px 20px 26px}.activity-modal-body h3{font-size:20px}.social-row{gap:8px}.social-link{padding:8px 12px;font-size:9px}}
-.social-link[aria-disabled="true"]{opacity:.4;cursor:not-allowed;pointer-events:none}
+@media(max-width:600px){.activities-grid{grid-template-columns:1fr}.activity-modal-panel{border-radius:20px}.activity-modal-body{padding:22px 20px 26px}.activity-modal-body h3{font-size:20px}.social-row{gap:8px}.social-link{padding:8px 12px;font-size:9px}.activity-video-badge{top:10px;left:10px;font-size:7px;padding:5px 9px 5px 7px}}
 
-@media(max-width:1100px){.activities-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.activities-grid{grid-template-columns:1fr}.activity-modal-panel{border-radius:20px}.activity-modal-body{padding:22px 20px 26px}.activity-modal-body h3{font-size:20px}.social-row{gap:8px}.social-link{padding:8px 12px;font-size:9px}}
+/* ===== Toi uu hieu nang cho dien thoai: giam hieu ung nang tren man hinh nho ===== */
+@media(max-width:767px){
+  .cursor-glow,.page-noise{display:none}
+  #particle-canvas{display:none}
+}
