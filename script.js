@@ -48,7 +48,34 @@ function initNavbar() {
     menuBtn.setAttribute("aria-expanded", String(open));
   });
   qsa(".mobile-menu a").forEach(link => link.addEventListener("click", closeMenu));
-  window.addEventListener("scroll", () => header.classList.toggle("scrolled", scrollY > 20), { passive: true });
+  // Đăng ký với vòng scroll gộp chung (xem initScrollLoop) thay vì tự thêm
+  // listener riêng — tránh nhiều listener cùng đọc/ghi layout mỗi lần cuộn.
+  onScroll(() => header.classList.toggle("scrolled", scrollY > 20));
+}
+
+/**
+ * Vòng lặp scroll DÙNG CHUNG cho toàn trang: thay vì mỗi tính năng (header,
+ * thanh tiến trình, nút back-to-top...) tự gắn 1 "scroll" listener riêng
+ * (mỗi listener chạy ngay lập tức, có thể hàng chục lần/giây trên điện
+ * thoại), tất cả đăng ký callback vào đây và chỉ được chạy TỐI ĐA 1 lần
+ * mỗi khung hình (requestAnimationFrame) — giảm đáng kể giật/lag khi cuộn.
+ */
+const scrollCallbacks = [];
+function onScroll(callback) {
+  scrollCallbacks.push(callback);
+}
+function initScrollLoop() {
+  let ticking = false;
+  const run = () => {
+    scrollCallbacks.forEach(callback => callback());
+    ticking = false;
+  };
+  window.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(run);
+  }, { passive: true });
+  run();
 }
  
 function initSmoothScroll() {
@@ -200,7 +227,9 @@ function initConfettiBurst() {
       const rect = btn.getBoundingClientRect();
       const originX = event.clientX || rect.left + rect.width / 2;
       const originY = event.clientY || rect.top + rect.height / 2;
-      for (let i = 0; i < 16; i++) {
+      // Ít hạt hơn trên điện thoại: đỡ tạo/xoá DOM node dồn dập khi bấm.
+      const bitCount = window.matchMedia("(max-width:767px)").matches ? 8 : 16;
+      for (let i = 0; i < bitCount; i++) {
         const bit = document.createElement("span");
         bit.className = "confetti-bit";
         const angle = Math.random() * Math.PI * 2;
@@ -387,7 +416,10 @@ function initCardTilt() {
 function initParallax() {
   const glow = qs(".cursor-glow");
   const scene = qs(".scene");
-  if (reducedMotion) return;
+  // Hiệu ứng bám theo con trỏ chuột chỉ có ý nghĩa (và chỉ hiển thị qua CSS)
+  // trên máy có chuột thật — bỏ qua hoàn toàn trên cảm ứng/điện thoại để
+  // không phải chạy pointermove + rAF liên tục mỗi lần chạm/vuốt màn hình.
+  if (reducedMotion || window.matchMedia("(pointer:coarse)").matches) return;
   let mx = innerWidth / 2, my = innerHeight / 2, raf = 0;
   document.addEventListener("pointermove", event => {
     mx = event.clientX; my = event.clientY;
@@ -410,10 +442,15 @@ function initParallax() {
 function initParticles() {
   const canvas = qs("#particle-canvas");
   if (!canvas || reducedMotion) return;
+  // CSS đã ẩn #particle-canvas trên điện thoại (≤900px) — không khởi tạo
+  // canvas/loop vẽ ở đây nữa, vì trước đây vòng lặp vẫn chạy vô hạn dù
+  // canvas không hiển thị, gây tốn CPU vô ích trên điện thoại.
+  if (window.matchMedia("(max-width:900px)").matches) return;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   let particles = [];
   let width = 0, height = 0;
+  let running = false;
   const resize = () => {
     const rect = canvas.parentElement.getBoundingClientRect();
     const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -429,6 +466,7 @@ function initParticles() {
     }));
   };
   const frame = () => {
+    if (!running) return;
     ctx.clearRect(0,0,width,height);
     particles.forEach(p => {
       p.x += p.vx; p.y += p.vy;
@@ -439,8 +477,21 @@ function initParticles() {
     });
     requestAnimationFrame(frame);
   };
+  // Chỉ chạy vòng lặp vẽ khi section chứa canvas thực sự lọt vào khung
+  // nhìn — cuộn qua khỏi màn hình sẽ tự dừng, tiết kiệm pin/CPU.
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !running) {
+        running = true;
+        frame();
+      } else if (!entry.isIntersecting) {
+        running = false;
+      }
+    });
+  }, { threshold: 0.05 });
+  observer.observe(canvas.parentElement);
   addEventListener("resize", resize, {passive:true});
-  resize(); frame();
+  resize();
 }
  
 function initScrollProgress() {
@@ -456,12 +507,12 @@ function initScrollProgress() {
       timeline.style.height = `${visible * 100}%`;
     }
   };
-  addEventListener("scroll", update, {passive:true}); update();
+  onScroll(update); update();
 }
  
 function initBackToTop() {
   const btn = qs(".back-top");
-  addEventListener("scroll", () => btn.classList.toggle("visible", scrollY > 600), {passive:true});
+  onScroll(() => btn.classList.toggle("visible", scrollY > 600));
   btn.addEventListener("click", () => scrollTo({top:0, behavior: reducedMotion ? "auto" : "smooth"}));
 }
  
@@ -505,7 +556,9 @@ function initBackgroundMusic() {
   if (!music) return;
  
   music.loop = true;
-  music.preload = "auto";
+  // Không tải trước file nhạc nền khi vừa vào trang (tốn băng thông/CPU
+  // giải mã trên điện thoại) — chỉ tải khi người dùng thực sự bấm phát.
+  music.preload = "none";
   music.volume = 0.35;
  
   let playing = false;
@@ -595,6 +648,7 @@ function initBackgroundMusic() {
   updateMusicButton();
 }
 function init() {
+  initScrollLoop();
   initNavbar();
   initSmoothScroll();
   initScrollReveal();
