@@ -229,6 +229,7 @@ function initActivityModal() {
   if (!modal || !cards.length) return;
 
   const img = qs("#activityModalImg", modal);
+  const video = qs("#activityModalVideo", modal);
   const tag = qs("#activityModalTag", modal);
   const title = qs("#activityModalTitle", modal);
   const desc = qs("#activityModalDesc", modal);
@@ -238,11 +239,37 @@ function initActivityModal() {
   function openModal(card) {
     lastFocused = document.activeElement;
     media.classList.remove("activity-missing");
-    img.src = card.dataset.img || "";
-    img.alt = card.dataset.alt || card.dataset.title || "";
     tag.textContent = card.dataset.tag || "";
     title.textContent = card.dataset.title || "";
     desc.textContent = card.dataset.desc || "";
+
+    if (card.dataset.video) {
+      media.classList.add("is-video");
+      video.poster = card.dataset.poster || "";
+      video.innerHTML = "";
+      if (card.dataset.videoWebm) {
+        const sourceWebm = document.createElement("source");
+        sourceWebm.src = card.dataset.videoWebm;
+        sourceWebm.type = "video/webm";
+        video.appendChild(sourceWebm);
+      }
+      const sourceMp4 = document.createElement("source");
+      sourceMp4.src = card.dataset.video;
+      sourceMp4.type = "video/mp4";
+      video.appendChild(sourceMp4);
+      video.controls = true;
+      video.muted = false;
+      video.load();
+      video.play().catch(() => {});
+    } else {
+      media.classList.remove("is-video");
+      video.pause();
+      video.removeAttribute("src");
+      video.innerHTML = "";
+      img.src = card.dataset.img || "";
+      img.alt = card.dataset.alt || card.dataset.title || "";
+    }
+
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-open");
@@ -253,6 +280,7 @@ function initActivityModal() {
     modal.classList.remove("open");
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("modal-open");
+    video.pause();
     lastFocused?.focus();
   }
 
@@ -271,6 +299,51 @@ function initActivityModal() {
   qsa("[data-close]", modal).forEach(el => el.addEventListener("click", closeModal));
   document.addEventListener("keydown", event => {
     if (event.key === "Escape" && modal.classList.contains("open")) closeModal();
+  });
+}
+
+/**
+ * Video mini-loop 5s trong thẻ "Hoạt động nổi bật" (mục đầu tiên).
+ * Chỉ tải & phát khi thẻ thực sự lọt vào khung nhìn (IntersectionObserver),
+ * và tự tạm dừng khi cuộn ra khỏi màn hình — tiết kiệm dữ liệu & pin trên
+ * điện thoại thay vì để video tự phát ngay khi tải trang.
+ */
+function initActivityVideos() {
+  const videos = qsa(".activity-video");
+  if (!videos.length) return;
+
+  const saveData = navigator.connection?.saveData === true;
+
+  videos.forEach(video => {
+    let loaded = false;
+
+    function loadSources() {
+      if (loaded) return;
+      loaded = true;
+      qsa("source", video).forEach(source => {
+        if (source.dataset.src) source.src = source.dataset.src;
+      });
+      video.load();
+    }
+
+    if (reducedMotion || saveData) {
+      // Không tự phát: chỉ hiển thị ảnh poster, tôn trọng chế độ tiết kiệm
+      // dữ liệu / giảm chuyển động của người dùng.
+      return;
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          loadSources();
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.35 });
+
+    observer.observe(video);
   });
 }
 
@@ -528,6 +601,7 @@ function init() {
   initFAQ();
   initQRButtons();
   initActivityModal();
+  initActivityVideos();
   initSocialLinks();
   initSocialHub();
   initMagneticButtons();
