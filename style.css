@@ -1014,10 +1014,27 @@ body.modal-open{overflow:hidden}
 @media(max-width:600px){.activities-grid{grid-template-columns:1fr}.activity-modal-panel{border-radius:20px}.activity-modal-body{padding:22px 20px 26px}.activity-modal-body h3{font-size:20px}.social-row{gap:8px}.social-link{padding:8px 12px;font-size:9px}.activity-video-badge{top:10px;left:10px;font-size:7px;padding:5px 9px 5px 7px}}
 
 /* ===== Toi uu hieu nang cho dien thoai: giam hieu ung nang tren man hinh nho ===== */
-@media(max-width:767px){
+@media(max-width:900px){
   .cursor-glow,.page-noise{display:none}
   #particle-canvas{display:none}
-}
-  .cursor-glow,.page-noise{display:none}
-  #particle-canvas{display:none}
+
+  /* backdrop-filter rất tốn GPU trên điện thoại, đặc biệt khi nhiều lớp
+     cùng lúc — bỏ blur, giữ nền đặc hơn một chút để vẫn rõ chữ */
+  .site-header.scrolled{backdrop-filter:none;background:rgba(5,20,38,.92)}
+  .mobile-menu{backdrop-filter:none;background:rgba(5,20,38,.98)}
+  .back-top{backdrop-filter:none;background:rgba(7,24,45,.94)}
+  .toast{backdrop-filter:none;background:rgba(6,20,38,.97)}
+  .activity-modal-backdrop{backdrop-filter:none;background:rgba(4,12,24,.9)}
+  .activity-video-badge{backdrop-filter:none;background:rgba(6,20,38,.75)}
+  .core,.glass-sphere{backdrop-filter:none}
+
+  /* Khối 3D trong hero: bớt số phần tử animate liên tục + tắt các animation
+     phụ, chỉ giữ lại hiệu ứng lõi để nhẹ máy mà vẫn còn "sống động" */
+  .cube-2,.sphere-2,.p3,.p4,.p5,.p6,.geo-line{display:none}
+  .scene-halo,.ring-1,.ring-2,.cube-1{animation:none}
+  .scene:before{filter:none}
+
+  /* Các quầng sáng nền lớn dùng filter:blur() ở các section khác cũng
+     rất nặng khi cuộn trên điện thoại — ẩn bớt, không ảnh hưởng nội dung */
+  .ctv-bg-orb,.social-bg-orb,.cta-mesh,.cta-orb{display:none}
 }
